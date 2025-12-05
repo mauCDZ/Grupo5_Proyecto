@@ -31,19 +31,25 @@ public class ColaB {
 
     //Atender
     public void TiqueteAtendidoB() {
-        if (esVacia()) {
-            JOptionPane.showMessageDialog(null, "Error, clientes no encontrados");
-        } else {
-            if (prim == null) {
-                prim.getDato().setHoraAtencion(hora); //Cuando se atiende, se asigna la hora actual a HoraAtencion
-                prim = ult = null;
-            } else {
-                prim = prim.getSig();
-                prim.getDato().setHoraAtencion(hora);
-                JOptionPane.showMessageDialog(null, "Es su turno de ser atendido, pase a la caja, " + prim); //Mensaje para indicarle al cliente que es su turno
-            }
+    if (esVacia()) {
+        JOptionPane.showMessageDialog(null, "Error, clientes no encontrados");
+    } else {
+
+        Nodo atendido = prim;             // cliente que se atiende
+        atendido.getDato().setHoraAtencion(LocalDateTime.now());
+
+        JOptionPane.showMessageDialog(null,
+                "Se está atendiendo a: " + atendido.getDato().getNombre());
+
+        prim = prim.getSig();             // avanzar en la cola
+
+        if (prim == null) {               // si quedó vacía
+            ult = null;
         }
+
+        cantClientes--;
     }
+}
 
     @Override
     public String toString() {
