@@ -4,10 +4,13 @@
  */
 package proyecto;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import javax.swing.JOptionPane;
 
 public class ColaP {
+    private int totalAtendidos = 0;
+    private long tiempoAcumulado = 0;
     private Nodo prim, ult;
     private int cantClientes = 0;
     LocalDateTime hora = LocalDateTime.now();
@@ -35,19 +38,49 @@ public class ColaP {
 
     //Atender
     public void TiqueteAtendidoP() {
-        if (esVacia()) {
-            JOptionPane.showMessageDialog(null, "Error, clientes no encontrados");
-        } else {
-            if (prim==null) {
-                prim.getDato().setHoraAtencion(hora); //Cuando se atiende, se asigna la hora actual a HoraAtencion
-                prim=ult=null;
-            } else {
-                prim=prim.getSig();
-                prim.getDato().setHoraAtencion(hora);
-                JOptionPane.showMessageDialog(null, "Es su turno de ser atendido, pase a la caja, " + prim); //Mensaje para indicarle al cliente que es su turno
-            }
+    if (esVacia()) {
+        JOptionPane.showMessageDialog(null, "Error, clientes no encontrados");
+    } else {
+
+        Nodo atendido = prim;
+        atendido.getDato().setHoraAtencion(LocalDateTime.now());
+
+        long segundos = Duration.between(
+            atendido.getDato().getHoraCreacion(),
+            atendido.getDato().getHoraAtencion()
+        ).getSeconds();
+
+        tiempoAcumulado += segundos;
+        totalAtendidos++;
+
+        JOptionPane.showMessageDialog(null,
+                "Se está atendiendo a: " + atendido.getDato().getNombre()
+                + "\nTiempo de espera: " + segundos + " segundos");
+
+        prim = prim.getSig();
+
+        if (prim == null) {
+            ult = null;
         }
+
+        cantClientes--;
     }
+}
+
+    public int getTotalAtendidos() {
+    return this.totalAtendidos;
+}
+    
+    public Dato getPrimDato() {
+    return prim != null ? prim.getDato() : null;
+}
+
+
+public long getPromedio() {
+    if (totalAtendidos == 0) return Long.MAX_VALUE; 
+
+    return tiempoAcumulado / totalAtendidos;
+}
     
     @Override
     public String toString() {
